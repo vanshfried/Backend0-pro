@@ -1,20 +1,15 @@
 <!-- index.html -->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Product Manager</title>
-</head>
+<html>
+<head><title>Mongo Product App</title></head>
 <body>
   <h1>Add Product</h1>
   <form action="/products" method="POST">
-    <input type="text" name="name" required placeholder="Product name" />
+    <input type="text" name="name" required placeholder="Product name">
     <button type="submit">Add</button>
   </form>
 
-  <hr />
-
-  <h2>Current Products</h2>
+  <h2>Products</h2>
   <ul id="product-list"></ul>
 
   <script>
@@ -25,11 +20,11 @@
       const ul = document.getElementById('product-list');
       ul.innerHTML = '';
 
-      products.forEach(product => {
+      products.forEach(p => {
         const li = document.createElement('li');
         li.innerHTML = `
-          ${product.name}
-          <form method="POST" action="/products/${product.id}?_method=DELETE" style="display:inline;">
+          ${p.name}
+          <form method="POST" action="/products/${p._id}?_method=DELETE" style="display:inline;">
             <button type="submit">Delete</button>
           </form>
         `;

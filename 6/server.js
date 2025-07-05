@@ -11,13 +11,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
 
+// In-memory data store
 const products = [
   { id: 1, name: 'Laptop' },
   { id: 2, name: 'Mouse' },
   { id: 3, name: 'Keyboard' }
 ];
 
-// Serve HTML
+// Serve index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -30,7 +31,7 @@ app.get('/products', (req, res) => {
 // Add a product
 app.post('/products', (req, res) => {
   const { name } = req.body;
-  if (!name) return res.status(400).send("Name required");
+  if (!name) return res.status(400).send("Name is required");
 
   const newProduct = {
     id: products.length + 1,
@@ -41,20 +42,16 @@ app.post('/products', (req, res) => {
   res.redirect('/');
 });
 
-// Delete a product
+// Delete a product by ID
 app.delete('/products/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const index = products.findIndex(p => p.id === id);
-
-  if (index === -1) {
-    return res.status(404).send("Product not found");
-  }
+  if (index === -1) return res.status(404).send("Product not found");
 
   products.splice(index, 1);
   res.redirect('/');
 });
 
-// Start server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
