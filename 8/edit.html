@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Product</title>
+</head>
+<body>
+  <h1>Edit Product</h1>
+  <form id="editForm" method="POST">
+    <input type="text" name="name" id="nameInput" required />
+    <button type="submit">Save</button>
+  </form>
+
+  <script>
+    const urlParts = window.location.pathname.split('/');
+    const productId = urlParts[urlParts.length - 1];
+
+    async function loadProduct() {
+      const res = await fetch(`/products/${productId}`);
+      const product = await res.json();
+      document.getElementById('nameInput').value = product.name;
+
+      const form = document.getElementById('editForm');
+      form.action = `/products/${productId}?_method=PATCH`;
+    }
+
+    loadProduct();
+  </script>
+</body>
+</html>

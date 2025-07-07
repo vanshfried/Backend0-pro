@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product Manager</title>
+</head>
+<body>
+  <h1>Add Product</h1>
+  <form action="/products" method="POST">
+    <input type="text" name="name" placeholder="Product name" required />
+    <button type="submit">Add</button>
+  </form>
+
+  <h2>All Products</h2>
+  <ul id="product-list"></ul>
+
+  <script>
+    async function fetchProducts() {
+      const res = await fetch('/products');
+      const products = await res.json();
+      const list = document.getElementById('product-list');
+      list.innerHTML = '';
+
+      products.forEach(p => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          ${p.name}
+          <a href="/edit/${p._id}">Edit</a>
+          <form action="/products/${p._id}?_method=DELETE" method="POST" style="display:inline;">
+            <button type="submit">Delete</button>
+          </form>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    fetchProducts();
+  </script>
+</body>
+</html>
