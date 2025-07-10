@@ -43,10 +43,10 @@ app.get('/products', async (req, res) => {
   res.json(products);
 });
 
-// API: Get single product by ID (for edit.html to fetch)
+// API: Get single product by ID (for edit page)
 app.get('/products/:id', async (req, res) => {
   const product = await Product.findById(req.params.id);
-  if (!product) return res.status(404).send("Not found");
+  if (!product) return res.status(404).send("Product not found");
   res.json(product);
 });
 
@@ -58,8 +58,14 @@ app.post('/products', async (req, res) => {
   res.redirect('/');
 });
 
-// API: Update product (via method override PATCH)
+// API: Update product
 app.patch('/products/:id', async (req, res) => {
-  await Product.findByIdAndUpdate(req.params.id, { name: req.body.name });
+  const { name } = req.body;
+  await Product.findByIdAndUpdate(req.params.id, { name });
+  res.redirect('/');
+});
+
+app.delete('/products/:id', async (req, res) => {
+  await Product.findByIdAndDelete(req.params.id);
   res.redirect('/');
 });

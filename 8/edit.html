@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Edit Product</title>
-</head>
-<body>
-  <h1>Edit Product</h1>
-  <form id="editForm" method="POST">
-    <input type="text" name="name" id="nameInput" required />
-    <button type="submit">Save</button>
-  </form>
+  <head>
+    <title>Edit Product</title>
+  </head>
+  <body>
+    <h1>Edit Product</h1>
+    <form id="editForm" method="POST">
+      <input type="hidden" name="_method" value="PATCH" />
+      <input type="text" name="name" id="productName" required />
+      <button type="submit">Save</button>
+    </form>
 
-  <script>
-    const urlParts = window.location.pathname.split('/');
-    const productId = urlParts[urlParts.length - 1];
+    <script>
+      const id = window.location.pathname.split("/").pop(); // gets the ID from URL
+      const form = document.getElementById("editForm");
+      const input = document.getElementById("productName");
+      
 
-    async function loadProduct() {
-      const res = await fetch(`/products/${productId}`);
-      const product = await res.json();
-      document.getElementById('nameInput').value = product.name;
-
-      const form = document.getElementById('editForm');
-      form.action = `/products/${productId}?_method=PATCH`;
-    }
-
-    loadProduct();
-  </script>
-</body>
+      // Fetch current product data
+      fetch(`/products/${id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          input.value = data.name;
+          form.action = `/products/${id}?_method=PATCH`;
+        })
+        .catch((err) => {
+          alert("Failed to load product.");
+        });
+    </script>
+  </body>
 </html>
