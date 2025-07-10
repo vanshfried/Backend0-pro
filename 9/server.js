@@ -28,7 +28,7 @@ const Product = mongoose.model('Product', new mongoose.Schema({
   name: String,
   featured: {
     type: Boolean,
-    default: false
+    default: true
   }
 }));
 
