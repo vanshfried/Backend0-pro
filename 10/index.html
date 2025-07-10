@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Inventory Manager</title>
+  </head>
+  <body>
+    <h1>Add Product</h1>
+    <form action="/products" method="POST">
+      <input type="text" name="name" placeholder="Product Name" required />
+      <input type="number" name="quantity" placeholder="Quantity" min="1" required />
+      <button type="submit">Add Product</button>
+    </form>
+
+    <h1>Update Quantity</h1>
+    <form id="updateForm" method="POST">
+      <input type="hidden" name="_method" value="PATCH" />
+      <input type="text" name="id" placeholder="Product ID" required />
+      <input
+        type="number"
+        name="quantity"
+        placeholder="New Quantity"
+        min="1"
+        required
+      />
+      <button type="submit">Update</button>
+    </form>
+
+    <ul id="productList"></ul>
+
+    <script>
+      fetch("/products")
+        .then((res) => res.json())
+        .then((data) => {
+          const list = document.getElementById("productList");
+          list.innerHTML = "";
+          data.forEach((p) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+          ${p.name} (Qty: ${p.quantity}) - ID: ${p._id}
+          <form action="/products/${p._id}?_method=DELETE" method="POST" style="display:inline">
+            <button type="submit">Delete</button>
+          </form>
+        `;
+            list.appendChild(li);
+          });
+        });
+      document
+        .getElementById("updateForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const id = this.id.value;
+          const quantity = this.quantity.value;
+
+          this.action = `/products/${id}?_method=PATCH`;
+          this.submit(); // now actually submit to PATCH route
+        });
+    </script>
+  </body>
+</html>
