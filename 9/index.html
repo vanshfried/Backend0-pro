@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product List</title>
+</head>
+<body>
+  <h1>Add Product</h1>
+  <form action="/products" method="POST">
+    <input type="text" name="name" placeholder="Product Name" required />
+    <label>
+      <input type="checkbox" name="featured" />
+      Mark as Featured
+    </label>
+    <button type="submit">Add</button>
+  </form>
+
+  <hr>
+
+  <h2>All Products</h2>
+  <button onclick="fetchProducts()">View All</button>
+  <button onclick="fetchFeatured()">View Featured Only</button>
+
+  <ul id="productList"></ul>
+
+  <script>
+    const ul = document.getElementById("productList");
+
+    function fetchProducts() {
+      fetch("/products")
+        .then(res => res.json())
+        .then(data => render(data));
+    }
+
+    function fetchFeatured() {
+      fetch("/products?featured=true")
+        .then(res => res.json())
+        .then(data => render(data));
+    }
+
+    function render(products) {
+      ul.innerHTML = '';
+      products.forEach(p => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${p.name} ${p.featured ? "(🌟 Featured)" : ""}
+          <a href="/edit/${p._id}">Edit</a>
+          <form method="POST" action="/products/${p._id}?_method=DELETE" style="display:inline;">
+            <button type="submit">Delete</button>
+          </form>
+        `;
+        ul.appendChild(li);
+      });
+    }
+
+    fetchProducts();
+  </script>
+</body>
+</html>
