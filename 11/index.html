@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Product Inventory</title>
+</head>
+<body>
+  <h1>Product Inventory</h1>
+
+  <!-- Search and Filter -->
+  <input type="text" id="searchInput" placeholder="Search by name..." />
+  <label>
+    <input type="checkbox" id="inStockCheckbox" /> Show only in-stock
+  </label>
+
+  <!-- Add Product -->
+  <h2>Add Product</h2>
+  <form action="/products" method="POST">
+    <input type="text" name="name" placeholder="Name" required />
+    <input type="number" name="quantity" placeholder="Quantity" required />
+    <button type="submit">Add</button>
+  </form>
+
+  <!-- Update Quantity -->
+  <h2>Update Product Quantity</h2>
+  <form id="updateForm">
+    <input type="hidden" name="_method" value="PATCH" />
+    <input type="text" name="id" placeholder="Product ID" required />
+    <input type="number" name="quantity" placeholder="New Quantity" required />
+    <button type="submit">Update</button>
+  </form>
+
+  <!-- Product List -->
+  <h2>All Products</h2>
+  <ul id="productList"></ul>
+
+  <script>
+    const list = document.getElementById("productList");
+    const searchInput = document.getElementById("searchInput");
+    const inStockCheckbox = document.getElementById("inStockCheckbox");
+
+    async function loadProducts(query = "") {
+      const res = await fetch("/products" + query);
+      const products = await res.json();
+      list.innerHTML = "";
+
+      products.forEach((p) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${p.name}</strong> (ID: <code>${p._id}</code>) - Qty: ${p.quantity}
+          <form method="POST" action="/products/${p._id}?_method=DELETE" style="display:inline;">
+            <button type="submit">Delete</button>
+          </form>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    // Load products initially
+    loadProducts();
+
+    // Real-time search + filter
+    function updateQuery() {
+      const search = searchInput.value;
+      const inStock = inStockCheckbox.checked;
+      const query = `?search=${encodeURIComponent(search)}&inStock=${inStock}`;
+      loadProducts(query);
+    }
+
+    searchInput.addEventListener("input", updateQuery);
+    inStockCheckbox.addEventListener("change", updateQuery);
+
+    // Update quantity
+    document.getElementById("updateForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const id = this.id.value;
+      const quantity = this.quantity.value;
+      this.action = `/products/${id}?_method=PATCH`;
+      this.submit();
+    });
+  </script>
+</body>
+</html>

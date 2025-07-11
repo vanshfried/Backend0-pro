@@ -7,12 +7,10 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
 
-// MongoDB Connect
 mongoose
   .connect(
     `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.ehzasp1.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`
@@ -23,7 +21,6 @@ mongoose
   })
   .catch((err) => console.error("❌ DB error:", err));
 
-// Schema
 const Product = mongoose.model(
   "Product",
   new mongoose.Schema({
@@ -32,13 +29,23 @@ const Product = mongoose.model(
   })
 );
 
-// Serve HTML
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.get("/products", async (req, res) => {
-  const products = await Product.find();
+  const { search, inStock } = req.query;
+  const filter = {};
+
+  if (search) {
+    filter.name = { $regex: search, $options: "i" };
+  }
+
+  if (inStock === "true") {
+    filter.quantity = { $gt: 0 };
+  }
+
+  const products = await Product.find(filter);
   res.json(products);
 });
 
@@ -54,13 +61,8 @@ app.patch("/products/:id", async (req, res) => {
   await Product.findByIdAndUpdate(id, { quantity });
   res.redirect("/");
 });
+
 app.delete("/products/:id", async (req, res) => {
   await Product.findByIdAndDelete(req.params.id);
   res.redirect("/");
 });
-
-// TODO: You will now write:
-// POST /products     → add product
-// PATCH /products/:id → update quantity
-// GET /products      → return all products
-// DELETE /products/:id → delete product
