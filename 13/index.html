@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live Product Search</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+    }
+    #results {
+      margin-top: 1rem;
+      list-style: none;
+      padding-left: 0;
+    }
+    #results li {
+      padding: 5px;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Live Product Search</h1>
+  <input type="text" id="search" placeholder="Type to search..." />
+  <ul id="results"></ul>
+
+  <script>
+    const searchInput = document.getElementById('search');
+    const resultsList = document.getElementById('results');
+
+    searchInput.addEventListener('keyup', async () => {
+      const query = searchInput.value.trim();
+
+      if (!query) {
+        resultsList.innerHTML = '';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/search?query=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        resultsList.innerHTML = data.map(p => `<li>${p.name}</li>`).join('');
+      } catch (err) {
+        resultsList.innerHTML = '<li>Error fetching data</li>';
+      }
+    });
+  </script>
+</body>
+</html>
